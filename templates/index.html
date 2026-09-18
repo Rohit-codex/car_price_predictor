@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Estimate the resale value of your used car with a machine-learning model.">
+    <title>Used Car Price Predictor | Rohit Malik</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <a class="skip-link" href="#prediction-form">Skip to price estimator</a>
+
+    <header class="site-header">
+        <div class="nav-shell">
+            <a class="brand" href="{{ url_for('index') }}" aria-label="Car price predictor home">
+                <span class="brand-mark" aria-hidden="true">CP</span>
+                <span>Car<span class="brand-accent">Predict</span></span>
+            </a>
+            <nav class="main-nav" aria-label="Primary navigation">
+                <a class="nav-link is-active" href="#estimator">Estimator</a>
+                <a class="nav-link" href="#how-it-works">How it works</a>
+            </nav>
+            <a class="profile-link" href="https://github.com/Rohit-codex" target="_blank" rel="noopener noreferrer">
+                <span class="profile-dot" aria-hidden="true"></span>
+                Rohit Malik
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" aria-labelledby="page-title">
+            <div class="hero-copy">
+                <p class="eyebrow">Machine-learning valuation</p>
+                <h1 id="page-title">Used Car<br><span>Price Predictor</span></h1>
+                <p class="hero-description">Get an approximate resale value for your vehicle using its make, model, age, fuel type, and distance travelled.</p>
+                <div class="hero-stats" aria-label="Estimator highlights">
+                    <div class="stat"><strong>5</strong><span>vehicle details</span></div>
+                    <div class="stat"><strong>₹</strong><span>instant estimate</span></div>
+                    <div class="stat"><strong>ML</strong><span>powered model</span></div>
+                </div>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+                <div class="art-grid"></div>
+                <div class="art-card art-card-top"><span>DATA-DRIVEN</span><strong>Car value,<br>made clear.</strong></div>
+                <div class="car-outline">
+                    <span class="car-roof"></span><span class="car-body"></span><span class="wheel wheel-left"></span><span class="wheel wheel-right"></span>
+                </div>
+                <div class="art-card art-card-bottom"><span>ESTIMATE</span><strong>In seconds</strong></div>
+            </div>
+        </section>
+
+        <section class="estimator-section" id="estimator" aria-labelledby="estimator-title">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Vehicle details</p>
+                    <h2 id="estimator-title">Build your estimate</h2>
+                </div>
+                <p>Complete the fields below for a tailored price prediction.</p>
+            </div>
+
+            <div class="estimator-layout">
+                <form id="prediction-form" class="prediction-card" method="post" accept-charset="utf-8" novalidate>
+                    <div class="form-heading">
+                        <span class="step-indicator" aria-hidden="true">01</span>
+                        <div>
+                            <h3>Car information</h3>
+                            <p>All fields are required for an accurate estimate.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="field-group">
+                            <label for="company">Manufacturer</label>
+                            <select id="company" name="company" required aria-describedby="form-message">
+                                <option value="" selected disabled>Select a company</option>
+                                {% for company in companies %}
+                                {% if company != 'Select Company' %}
+                                <option value="{{ company }}">{{ company }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="car_models">Model</label>
+                            <select id="car_models" name="car_models" required disabled aria-describedby="form-message">
+                                <option value="" selected>Select a company first</option>
+                            </select>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="year">Year of purchase</label>
+                            <select id="year" name="year" required aria-describedby="form-message">
+                                <option value="" selected disabled>Select a year</option>
+                                {% for year in years %}
+                                <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="fuel_type">Fuel type</label>
+                            <select id="fuel_type" name="fuel_type" required aria-describedby="form-message">
+                                <option value="" selected disabled>Select fuel type</option>
+                                {% for fuel in fuel_types %}
+                                <option value="{{ fuel }}">{{ fuel }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field-group field-group-wide">
+                            <label for="kilo_driven">Kilometres driven</label>
+                            <div class="input-with-suffix">
+                                <input type="number" id="kilo_driven" name="kilo_driven" min="0" step="1" inputmode="numeric" placeholder="For example, 45000" required aria-describedby="distance-hint form-message">
+                                <span aria-hidden="true">KM</span>
+                            </div>
+                            <p id="distance-hint" class="field-hint">Enter the total distance travelled by the car.</p>
+                        </div>
+                    </div>
+
+                    <p id="form-message" class="form-message" role="alert" aria-live="assertive" hidden></p>
+                    <button class="predict-button" type="submit">
+                        <span>Predict price</span>
+                        <span class="button-arrow" aria-hidden="true">→</span>
+                    </button>
+                </form>
+
+                <aside class="result-card" aria-labelledby="result-title" aria-live="polite">
+                    <div class="result-card-top">
+                        <span class="result-icon" aria-hidden="true">₹</span>
+                        <span class="result-status">Ready when you are</span>
+                    </div>
+                    <p class="eyebrow">Predicted price</p>
+                    <h2 id="result-title" class="result-value"><span id="prediction">—</span></h2>
+                    <p id="result-copy" class="result-copy">Your approximate selling price will appear here after you submit the form.</p>
+                    <div class="result-note"><span aria-hidden="true">✦</span> Based on historical used-car data</div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="how-it-works" id="how-it-works" aria-labelledby="how-title">
+            <div>
+                <p class="eyebrow">Simple process</p>
+                <h2 id="how-title">A clearer starting point<br>for your sale.</h2>
+            </div>
+            <ol class="process-list">
+                <li><span>01</span><div><strong>Add car details</strong><p>Tell us the make, model, year, fuel type, and mileage.</p></div></li>
+                <li><span>02</span><div><strong>Run the estimate</strong><p>Our trained regression model processes your vehicle details.</p></div></li>
+                <li><span>03</span><div><strong>Review the price</strong><p>Use the result as a helpful guide for your next step.</p></div></li>
+            </ol>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2026 Rohit Malik. Built as a machine-learning portfolio project.</p>
+        <a href="https://github.com/Rohit-codex" target="_blank" rel="noopener noreferrer">github.com/Rohit-codex <span aria-hidden="true">↗</span></a>
+    </footer>
+
+    <script>
+        const form = document.getElementById('prediction-form');
+        const companySelect = document.getElementById('company');
+        const prediction = document.getElementById('prediction');
+        const resultCopy = document.getElementById('result-copy');
+        const formMessage = document.getElementById('form-message');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        function load_car_models(companyId, carModelId) {
+            const company = document.getElementById(companyId);
+            const carModel = document.getElementById(carModelId);
+            carModel.innerHTML = '<option value="" selected disabled>Select a model</option>';
+            carModel.disabled = !company.value;
+
+            {% for company in companies %}
+                {% if company != 'Select Company' %}
+                if (company.value === {{ company|tojson }}) {
+                    {% for model in car_models %}
+                        {% if company in model %}
+                        const newOption = document.createElement('option');
+                        newOption.value = {{ model|tojson }};
+                        newOption.textContent = {{ model|tojson }};
+                        carModel.appendChild(newOption);
+                        {% endif %}
+                    {% endfor %}
+                }
+                {% endif %}
+            {% endfor %}
+        }
+
+        companySelect.addEventListener('change', function () {
+            load_car_models('company', 'car_models');
+        });
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            formMessage.hidden = true;
+            formMessage.textContent = '';
+
+            if (!form.checkValidity()) {
+                const firstInvalidField = form.querySelector(':invalid');
+                formMessage.textContent = 'Please complete the highlighted field before predicting the price.';
+                formMessage.hidden = false;
+                firstInvalidField.focus();
+                return;
+            }
+
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span>Calculating...</span><span class="button-arrow" aria-hidden="true">•</span>';
+            prediction.textContent = 'Calculating';
+            resultCopy.textContent = 'Our model is analysing your vehicle details.';
+
+            const request = new XMLHttpRequest();
+            request.open('POST', '/predict', true);
+            request.onload = function () {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+                if (request.status >= 200 && request.status < 300 && request.responseText) {
+                    const numericPrice = Number(request.responseText);
+                    prediction.textContent = Number.isFinite(numericPrice)
+                        ? '₹' + numericPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })
+                        : '₹' + request.responseText;
+                    resultCopy.textContent = 'This is an approximate resale value based on the details you provided.';
+                } else {
+                    prediction.textContent = 'Unavailable';
+                    resultCopy.textContent = 'We could not calculate a price right now. Please review your details and try again.';
+                }
+            };
+            request.onerror = function () {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+                prediction.textContent = 'Unavailable';
+                resultCopy.textContent = 'We could not connect to the price service. Please try again.';
+            };
+            request.send(new FormData(form));
+        });
+    </script>
+</body>
+</html>
